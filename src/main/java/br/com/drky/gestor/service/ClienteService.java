@@ -25,11 +25,7 @@ public class ClienteService {
 	private ClienteRepository repository;
 
 	public Boolean eValido(TipoCliente tipo, String documento) {
-		Boolean var = (tipo == TipoCliente.FISICO) ? verificarCPF(documento) : verificarCNPJ(documento);
-		if (var) {
-			return true;
-		}
-		return false;
+		return (tipo == TipoCliente.FISICO) ? verificarCPF(documento) : verificarCNPJ(documento);
 	}
 
 	public void deleteAll() {
@@ -48,9 +44,7 @@ public class ClienteService {
 		TipoCliente tipo = TipoCliente.valueOf(dto.tipo().toUpperCase());
 		String documento = dto.cpfCnpj();
 
-		boolean eValido = eValido(tipo, documento);
-
-		if (!eValido) {
+		if (!eValido(tipo, documento)) {
 			throw new InvalidClientDocumentException(tipo == TipoCliente.FISICO ? "CPF inválido" : "CNPJ inválido");
 		}
 
@@ -100,12 +94,7 @@ public class ClienteService {
 	public Cliente buscaClientePorId(Integer id) {
 
 		try {
-			Optional<Cliente> byId = repository.findById(id);
-			if (byId.isPresent()) {
-				return byId.get();
-			} else {
-				throw new ClientNotFoundException("Cliente não encontrado");
-			}
+			return repository.findById(id).orElseThrow(() -> new ClientNotFoundException("Cliente não encontrado"));
 		} catch (MethodArgumentTypeMismatchException e) {
 			throw new InvalidObjectOnRequestException("Dados invalidos");
 		}
